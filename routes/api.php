@@ -4,6 +4,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Laravel\Sanctum\Sanctum;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,7 +21,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/', function(){
+Route::get('/', function () {
     return response()->json([
         'status'  => false,
         'message' => 'Akses tidak diperbolehkan'
@@ -29,6 +30,12 @@ Route::get('/', function(){
 
 Route::post('registerUser', [AuthController::class, 'registerUser']);
 Route::post('loginUser', [AuthController::class, 'loginUser']);
-Route::prefix('product')->group(function(){
+Route::post('/logout', [AuthController::class, 'logoutUser'])->middleware('auth:sanctum');
+
+
+Route::prefix('product')->group(function () {
     Route::get('/', [ProductController::class, 'index'])->middleware('auth:sanctum');
+    Route::post('/', [ProductController::class, 'store'])->middleware('auth:sanctum');
+    Route::put('/{id}', [ProductController::class, 'update'])->middleware('auth:sanctum');
+    Route::delete('/{id}', [ProductController::class, 'destroy'])->middleware('auth:sanctum');
 });

@@ -40,7 +40,8 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function loginUser (Request $request){
+    public function loginUser(Request $request)
+    {
         $rules = [
             'email'     => 'required|email',
             'password'  => 'required',
@@ -55,18 +56,24 @@ class AuthController extends Controller
             ], 401);
         }
 
-        if(!Auth::attempt($request->only(['email', 'password']))){
+        if (!Auth::attempt($request->only(['email', 'password']))) {
             return response()->json([
                 'status' => false,
-                'message'=> 'email dan password yang dimasukan tidak sesuai'
+                'message' => 'email dan password yang dimasukan tidak sesuai'
             ], 401);
         }
 
         $dataUser = User::where('email', $request->email)->first();
         return response()->json([
             'status' => true,
-            'message'=> 'berhasil proses login',
-            'token' =>$dataUser->createToken('api-token')->plainTextToken
+            'message' => 'berhasil proses login',
+            'token' => $dataUser->createToken('api-token')->plainTextToken
         ]);
+    }
+
+    public function logoutUser(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+        return response()->json(['message' => 'Successfully loggout']);
     }
 }
